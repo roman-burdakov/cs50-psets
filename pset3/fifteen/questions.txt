@@ -1,0 +1,9 @@
+questions.txt
+
+Computer Science 50
+Problem Set 3
+
+0. Framework allow any demension in range from 3 to 9
+1. 2 dimensional array
+2. "greet()" function is called to greet player at the game start
+3. "init()", "draw()", "move(int tile)", "won()" have to be implemented
