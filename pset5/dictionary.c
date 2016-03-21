@@ -13,7 +13,7 @@
 
 #include "dictionary.h"
 
-// our hashtable.
+// our hashtable to store dictionary
 hashtable* dict;
 
 /**
@@ -50,7 +50,8 @@ bool load(const char* dictionary)
     int index;
     char word[LENGTH + 1];
     
-    // go over entire file and read each line into word var until you won't get eof
+    // go over entire file and read each line into word var until you won't 
+    // get EOF (end of the file)
     while (fscanf(inptr, "%s", word) == 1)
     {
         // create new node and copy word that we have read from a file
@@ -63,8 +64,9 @@ bool load(const char* dictionary)
 
         // sorting linked list didn't give fast total performance, so we just
         // insert new node as a head to existing list. That way load is fast and
-        // with relativly big table (number of buckets) and relativly intermidiate
-        // size of a dictinary, check() still performs resonably fast
+        // with relativly big table (number of buckets) and relativly 
+        // intermidiate size of a dictinary, check() still performs resonably 
+        // fast
         if (head != NULL) 
             new_node->next = head;
         // update table with new head.
