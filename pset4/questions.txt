@@ -1,0 +1,30 @@
+0.  Color support: GIF - 256; BMP - 16.7M (but might vary based on header input); 
+    PNG - 256T (281,474,976,710,656); JPEG - 16.7M
+1.  GIF supports animation
+2.  Lossless compression is used when every single bit of data can be restored.
+    Lossy compression permanently reduces information that it treats as 
+    redundant as far as compression algorythm is conserned.
+3.  Lossy-compressed - JPEG
+4.  The first character of the directory entry is changed to 0xE5.
+    It is only overwritten if/when a new directory overwrites it.
+5.  Do a "secure delete" which overwrites bits with random noise or all "0" 
+6.  stdint.h defines number of standard type and typedefs including but not 
+    limted by uint8_t, uint32_t, int32_t , uint16_t - which are used in bmp.h
+7.  stdint.h is used for specific sizes of integer data types. Those types are
+    robust and portable to any architecture (i.e. 16/32/64bits) and reserves 
+    right amount of memory
+8.  1, 4, 4, 2 bytes respectively
+9.  first 2 bytes are usef for the header field which identifies the BMP file
+10. bfSize used to store full file size while biSize is for 
+    the header size (BITMAPCOREHEADER)
+11. It means that the image lines are stored top-down, not bottom-up as usual
+12. biBitCount specifies color depth in BMP image
+13. If we have filed to create a file. Might be if we don't have disk space or 
+    more likely permissions to write files in the given directory.
+14. Because we always read one byte at the time for each pixel which is 1 byte.
+15. biWidth represents width of the bitmap in pixels minus the padding. 
+    A scanline number must be a multiple of 4, thus: 3 px * bytes per pixel 
+    = 9 bytes + x = 12 to be multiple by 4. Thus the answer is 3 bytes.
+16. moves position indicator to a specific location in a stream (like file)
+17. SEEK_CUR is a current position of the file pointer
+18. Looks like David Malan

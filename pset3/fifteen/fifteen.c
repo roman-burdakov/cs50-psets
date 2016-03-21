@@ -172,6 +172,10 @@ void init(void)
     } while(n > 0);
     
     // if board size is even, swap last two tiles
+<<<<<<< HEAD
+=======
+    // NB: "0" represents missing tile.
+>>>>>>> Updating workspace from C9 IDE after PSET5
     if (d % 2 == 0) {
         // swap using XOR to avoid overflow.
         board[d-1][d-2] = board[d-1][d-2] ^ board[d-1][d-3];
@@ -222,7 +226,11 @@ bool move(int tile)
                 break;
             }
     
+<<<<<<< HEAD
     // shift if it is possible otherwise return false
+=======
+    // shift tile if it is possible otherwise return false
+>>>>>>> Updating workspace from C9 IDE after PSET5
     if (i-1 >= 0 && board[i-1][j] == 0) {
         // shift up
         board[i-1][j] = board[i][j];
@@ -256,14 +264,22 @@ bool won(void)
     // quick check if last time isn't empty (value = 0)
     if (board[d-1][d-1] != 0) 
         return false;
+<<<<<<< HEAD
     for (int i = 0; i < d; i++) 
     {
+=======
+    // verify that array is sorted in ascending order with last el. being 0
+    for (int i = 0; i < d; i++) 
+>>>>>>> Updating workspace from C9 IDE after PSET5
         for (int j = 0; j < d; j++) 
         {
             if (prev + 1 > board[i][j] && board[i][j] != 0) 
                 return false;
             prev = board[i][j];
         }
+<<<<<<< HEAD
     }
+=======
+>>>>>>> Updating workspace from C9 IDE after PSET5
     return true;
 }

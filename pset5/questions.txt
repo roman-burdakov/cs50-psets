@@ -1,0 +1,34 @@
+0.  "Pneumonoultramicroscopicsilicovolcanoconiosis" - is an artificial long 
+    word said to mean a lung disease caused by inhaling very fine ash and sand 
+    dust. (c) Oxford English Dictionary
+1.  getrusage is used to report on resource usage. It collects various metrics 
+    like CPU time usage, memory usage, page faults, IO, etc and have various
+    settings to collect statistics on process itself or its children.
+2.  rusage structs contains 16 fields.
+3.  getrusage() function signature expects a pointer. Using pointers instead of 
+    values considered to be better and faster even if you aren't expecting to 
+    change var content.
+4.  Once input file is openned, a loop starts with reading one char from each
+    string until EOF (end of the file) const is reached. For each line only 
+    alphabetical characters and apostrophes will be processed. To ensure that,
+    if conditions will be checking every single character that would be read 
+    on every pass of the for loop. Apostrophes are allowed as long as it it 
+    is not a beginning of the string.
+5.  To avoid reading non alphabetical character or apostrophes at the 
+    beginnning of the string. Deal with undesired characters is better while 
+    you are reading the word then dealing with them afterwords.
+6.  check, load and const each declared to measure resource usage for 
+    the corresponding task. I.e. load will record time that we have spent
+    for loading dictionary in memory, check for checking spelling and
+    finally a const for sum total.
+7.  Unsorted hashtable with linked list to store buckets in the table. 
+    I picked it because it can run faster than trie if properly implemented
+    Each node has a word and pointer to a next node in the list.
+8.  It was 6 times slower than staff solution for austin powers.
+9.  I have get rid of sorting for linked list and increased number 
+    of buckets in the table to 65536 - which is largest superperfect number
+    that can be stored in 2 bytes (16 bits). I used hash function suggested 
+    by TA instead of mine. Mine was actually ok since I used similar idea. 
+    Lastly, I have avoided unnecessary sanity checks, var declarations and 
+    tried to keep implementation short.
+10. No bottlenecks. 
