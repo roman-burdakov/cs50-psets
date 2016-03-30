@@ -1,0 +1,128 @@
+cmake_minimum_required(VERSION 3.4)
+project(psets)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
+set(SOURCE_FILES
+    pset1/greedy.c
+    pset1/hello.c
+    pset1/hello.txt
+    pset1/mario.c
+    pset1/water.c
+    pset2/caesar.c
+    pset2/initials.c
+    pset2/vigenere.c
+    pset3/fifteen/fifteen.c
+    pset3/find/find.c
+    pset3/find/generate.c
+    pset3/find/helpers.c
+    pset3/find/helpers.h
+    pset4/bmp/bmp.h
+    pset4/bmp/copy.c
+    pset4/bmp/resize.c
+    pset4/bmp/whodunit.c
+    pset4/jpg/recover.c
+    pset4/questions.txt
+    pset5/dictionaries/large
+    pset5/dictionaries/small
+    pset5/keys/alice.txt
+    pset5/keys/austen.txt
+    pset5/keys/austinpowers.txt
+    pset5/keys/christmas.txt
+    pset5/keys/constitution.txt
+    pset5/keys/daffodils.txt
+    pset5/keys/dracula.txt
+    pset5/keys/federalist.txt
+    pset5/keys/frankenstein.txt
+    pset5/keys/grimm.txt
+    pset5/keys/holmes.txt
+    pset5/keys/huck.txt
+    pset5/keys/hugo.txt
+    pset5/keys/iliad.txt
+    pset5/keys/kjv.txt
+    pset5/keys/men.txt
+    pset5/keys/package.txt
+    pset5/keys/pneumonoultramicroscopicsilicovolcanoconiosis.txt
+    pset5/keys/prince.txt
+    pset5/keys/quote.txt
+    pset5/keys/ralph.txt
+    pset5/keys/shakespeare.txt
+    pset5/keys/sherlock.txt
+    pset5/keys/surgery.txt
+    pset5/keys/tolstoy.txt
+    pset5/keys/tom.txt
+    pset5/keys/ulysses.txt
+    pset5/keys/usa.txt
+    pset5/keys/whittier.txt
+    pset5/keys/witch.txt
+    pset5/keys/wonderland.txt
+    pset5/keys/xueqin1.txt
+    pset5/keys/xueqin2.txt
+    pset5/texts/alice.txt
+    pset5/texts/austen.txt
+    pset5/texts/austinpowers.txt
+    pset5/texts/christmas.txt
+    pset5/texts/constitution.txt
+    pset5/texts/daffodils.txt
+    pset5/texts/dracula.txt
+    pset5/texts/federalist.txt
+    pset5/texts/frankenstein.txt
+    pset5/texts/grimm.txt
+    pset5/texts/holmes.txt
+    pset5/texts/huck.txt
+    pset5/texts/hugo.txt
+    pset5/texts/iliad.txt
+    pset5/texts/kjv.txt
+    pset5/texts/men.txt
+    pset5/texts/package.txt
+    pset5/texts/pneumonoultramicroscopicsilicovolcanoconiosis.txt
+    pset5/texts/prince.txt
+    pset5/texts/quote.txt
+    pset5/texts/ralph.txt
+    pset5/texts/shakespeare.txt
+    pset5/texts/sherlock.txt
+    pset5/texts/surgery.txt
+    pset5/texts/tolstoy.txt
+    pset5/texts/tom.txt
+    pset5/texts/ulysses.txt
+    pset5/texts/usa.txt
+    pset5/texts/whittier.txt
+    pset5/texts/witch.txt
+    pset5/texts/wonderland.txt
+    pset5/texts/xueqin1.txt
+    pset5/texts/xueqin2.txt
+    pset5/dictionary.c
+    pset5/dictionary.h
+    pset5/emailWithErrors.txt
+    pset5/Makefile
+    pset5/myDict.txt
+    pset5/pset5-questions.txt
+    pset5/questions.txt
+    pset5/speller.c
+    pset6/public/test/index.html
+    pset6/public/cat.html
+    pset6/public/cat.jpg
+    pset6/public/favicon.ico
+    pset6/public/hello.html
+    pset6/public/hello.php
+    pset6/Makefile
+    pset6/server.c
+    README.md)
+
+include_directories(.)
+include_directories(pset1)
+include_directories(pset2)
+include_directories(pset3)
+include_directories(pset3/fifteen)
+include_directories(pset3/find)
+include_directories(pset4)
+include_directories(pset4/bmp)
+include_directories(pset4/jpg)
+include_directories(pset5)
+include_directories(pset5/dictionaries)
+include_directories(pset5/keys)
+include_directories(pset5/texts)
+include_directories(pset6)
+include_directories(pset6/public)
+
+add_executable(psets ${SOURCE_FILES})

@@ -35,6 +35,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <ctype.h>
 
 // types
 typedef char BYTE;
@@ -326,7 +327,7 @@ void freedir(struct dirent** namelist, int n)
         free(namelist);
     }
 }
- 
+
 /**
  * Handles signals.
  */
@@ -444,7 +445,21 @@ char* htmlspecialchars(const char* s)
  */
 char* indexes(const char* path)
 {
-    // TODO
+    /* pretty much constants for index extensions */
+    char* html_ext = "/index.html";
+    char* php_ext  = "/index.php";
+    /* alocate memory for full path to a file */
+    size_t len = strlen(path);
+    char* full_html_path = malloc(len + strlen(php_ext) + 1 );
+    char* full_php_path = malloc(len + strlen(html_ext) + 1 );
+    /* define full path to file with extension */
+    strcat(strcpy(full_html_path, path), html_ext);
+    strcat(strcpy(full_php_path, path), php_ext);
+    /* return full path to index file if it exists. Check html first */
+    if (access(full_html_path, R_OK) != -1) return full_html_path;
+    if (access(full_php_path, R_OK) != -1) return full_php_path;
+    /* Error */
+    error(403);
     return NULL;
 }
 
@@ -609,8 +624,53 @@ void list(const char* path)
  */
 bool load(FILE* file, BYTE** content, size_t* length)
 {
-    // TODO
-    return false;
+    // buffer. this pointer will be used to update content.
+    BYTE *source = NULL;
+    if (file != NULL)
+    {
+        /* Go to the end of the file. */
+        if (fseek(file, 0L, SEEK_END) == 0)
+        {
+            /* Get the size of the file. */
+            *length = (size_t) ftell(file);
+            if (*length == -1) /* Error */
+            {
+                error(500);
+                return false;
+            }
+
+            /* Allocate our buffer to that size. */
+            source = malloc(sizeof(BYTE) * (*length + 1));
+
+            /* Go back to the start of the file. */
+            if (fseek(file, 0L, SEEK_SET) != 0)
+            {
+                error(500);
+                return false;
+            }
+
+            /* Read the entire file into memory. */
+            size_t newLen = fread(source, sizeof(BYTE), *length, file);
+            if (newLen == 0) {
+                /* Error reading file */
+                error(500);
+                return false;
+            }
+            else
+                source[++newLen] = '\0'; /* Just to be safe. */
+        }
+        fclose(file);
+    }
+    else
+    {
+        /* file pointer is null. Should not happen unless code above changed */
+        error(500);
+        return false;
+    }
+    /* assign result to content. Don't need to free since we do it at
+     * the end of the transfer method call. If free now it will fail later */
+    *content = source;
+    return true;
 }
 
 /**
@@ -618,7 +678,21 @@ bool load(FILE* file, BYTE** content, size_t* length)
  */
 const char* lookup(const char* path)
 {
-    // TODO
+    if (path != NULL)
+    {
+        char* extension = strstr(path, ".");
+        // matching page extensions
+        if (strcasecmp(extension, ".php") == 0) return "text/x-php";
+        if (strcasecmp(extension, ".html") == 0) return "text/html";
+        // matching javascript and css
+        if (strcasecmp(extension, ".js") == 0) return "text/javascript";
+        if (strcasecmp(extension, ".css") == 0) return "text/css";
+        // matching image files
+        if (strcasecmp(extension, ".jpg") == 0) return "image/jpeg";
+        if (strcasecmp(extension, ".png") == 0) return "image/png";
+        if (strcasecmp(extension, ".gif") == 0) return "image/gif";
+        if (strcasecmp(extension, ".ico") == 0) return "image/x-icon";
+    }
     return NULL;
 }
 
@@ -629,9 +703,43 @@ const char* lookup(const char* path)
  */
 bool parse(const char* line, char* abs_path, char* query)
 {
-    // TODO
-    error(501);
-    return false;
+    /* req. exmp: "GET /cat.jpg HTTP/1.1","GET /hello.php?name=hello HTTP/1.1"*/
+    /* tmp var */
+    char* tmp = malloc((strlen(line) + 1) * sizeof(char));;
+    strcpy(tmp, line);
+    /* break input on tokens. use space as delimiter */
+    char* method = strtok(tmp, " ");
+    char* request = strtok(NULL, " ");
+    char* http_version = strtok(NULL, " ");
+
+    // check for unsupported request method
+    if (strcmp(method, "GET") != 0)
+    {
+        error(405);
+        return false;
+    }
+    // check for unsupported protocol
+    if (strstr(http_version, "HTTP/1.1") == NULL)
+    {
+        error(505);
+        return false;
+    }
+    if (strchr(request, '?') == NULL)
+    {
+        strcpy(query, ""); /* handle no query request */
+        strcpy(abs_path, request);
+    }
+    else
+    {
+        strcpy(query, strtok(NULL, "?")); /* handle request with query */
+        strcpy(abs_path, strtok(request, "?"));
+    }
+
+    strcat(abs_path, "\0");
+    strcat(query, "\0");
+    // clean-up
+    free(tmp);
+    return true;
 }
 
 /**
@@ -1005,7 +1113,7 @@ char* urldecode(const char* s)
     {
         return NULL;
     }
-    
+
     // iterate over characters in s, decoding percent-encoded octets, per
     // https://www.ietf.org/rfc/rfc3986.txt
     for (int i = 0, j = 0, n = strlen(s); i < n; i++, j++)
