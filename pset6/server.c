@@ -35,7 +35,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <ctype.h>
 
 // types
 typedef char BYTE;
@@ -67,12 +66,16 @@ char* root = NULL;
 // file descriptor for sockets
 int cfd = -1, sfd = -1;
 
+/* pretty much constants for index extensions */
+char* html_ext = "/index.html";
+char* php_ext  = "/index.php";
+
 // flag indicating whether control-c has been heard
 bool signaled = false;
 
 int main(int argc, char* argv[])
 {
-    // a global variable defined in errno.h that's "set by system 
+    // a global variable defined in errno.h that's "set by system
     // calls and some library functions [to a nonzero value]
     // in the event of an error to indicate what went wrong"
     errno = 0;
@@ -268,7 +271,7 @@ int main(int argc, char* argv[])
 }
 
 /**
- * Checks (without blocking) whether a client has connected to server. 
+ * Checks (without blocking) whether a client has connected to server.
  * Returns true iff so.
  */
 bool connected(void)
@@ -445,21 +448,22 @@ char* htmlspecialchars(const char* s)
  */
 char* indexes(const char* path)
 {
-    /* pretty much constants for index extensions */
-    char* html_ext = "/index.html";
-    char* php_ext  = "/index.php";
-    /* alocate memory for full path to a file */
+    /* allocate memory for full path to a file */
     size_t len = strlen(path);
-    char* full_html_path = malloc(len + strlen(php_ext) + 1 );
-    char* full_php_path = malloc(len + strlen(html_ext) + 1 );
+    char* full_php_path = malloc(len + strlen(php_ext) + 1 );
     /* define full path to file with extension */
-    strcat(strcpy(full_html_path, path), html_ext);
     strcat(strcpy(full_php_path, path), php_ext);
     /* return full path to index file if it exists. Check html first */
-    if (access(full_html_path, R_OK) != -1) return full_html_path;
     if (access(full_php_path, R_OK) != -1) return full_php_path;
-    /* Error */
-    error(403);
+
+    // try the same for html, but free php path first
+    free(full_php_path);
+    char* full_html_path = malloc(len + strlen(html_ext) + 1 );
+    strcat(strcpy(full_html_path, path), html_ext);
+
+    if (access(full_html_path, R_OK) != -1) return full_html_path;
+    /* requested "/" root without index.html or index.php */
+    free(full_html_path);
     return NULL;
 }
 
@@ -624,52 +628,36 @@ void list(const char* path)
  */
 bool load(FILE* file, BYTE** content, size_t* length)
 {
-    // buffer. this pointer will be used to update content.
-    BYTE *source = NULL;
-    if (file != NULL)
+    BYTE* byte_block  = malloc(sizeof(BYTE));
+    BYTE* source = NULL;
+    BYTE* buffer = NULL;
+    int bytes_read = 0;
+
+    do
     {
-        /* Go to the end of the file. */
-        if (fseek(file, 0L, SEEK_END) == 0)
+        /* read one byte */
+        fread(byte_block, sizeof(BYTE), 1, file);
+        bytes_read++;
+        /* reallocate memory for updated size */
+        buffer = realloc(source, bytes_read * sizeof(BYTE));
+        /* if successfully got memory, update source with new byte */
+        if (buffer != NULL)
         {
-            /* Get the size of the file. */
-            *length = (size_t) ftell(file);
-            if (*length == -1) /* Error */
-            {
-                error(500);
-                return false;
-            }
-
-            /* Allocate our buffer to that size. */
-            source = malloc(sizeof(BYTE) * (*length + 1));
-
-            /* Go back to the start of the file. */
-            if (fseek(file, 0L, SEEK_SET) != 0)
-            {
-                error(500);
-                return false;
-            }
-
-            /* Read the entire file into memory. */
-            size_t newLen = fread(source, sizeof(BYTE), *length, file);
-            if (newLen == 0) {
-                /* Error reading file */
-                error(500);
-                return false;
-            }
-            else
-                source[++newLen] = '\0'; /* Just to be safe. */
+            source = buffer;
+            source[bytes_read - 1] = *byte_block;
         }
-        fclose(file);
-    }
-    else
-    {
-        /* file pointer is null. Should not happen unless code above changed */
-        error(500);
-        return false;
-    }
-    /* assign result to content. Don't need to free since we do it at
-     * the end of the transfer method call. If free now it will fail later */
+        else
+        {
+            /* Error? failed to load. free memory and return false */
+            free(buffer);
+            free(byte_block);
+            return false;
+        }
+    } while(!feof(file));
+    // free last block and update pointers.
+    free(byte_block);
     *content = source;
+    *length  = (size_t) bytes_read;
     return true;
 }
 
@@ -681,23 +669,25 @@ const char* lookup(const char* path)
     if (path != NULL)
     {
         char* extension = strstr(path, ".");
-        // matching page extensions
-        if (strcasecmp(extension, ".php") == 0) return "text/x-php";
-        if (strcasecmp(extension, ".html") == 0) return "text/html";
-        // matching javascript and css
-        if (strcasecmp(extension, ".js") == 0) return "text/javascript";
-        if (strcasecmp(extension, ".css") == 0) return "text/css";
-        // matching image files
-        if (strcasecmp(extension, ".jpg") == 0) return "image/jpeg";
-        if (strcasecmp(extension, ".png") == 0) return "image/png";
-        if (strcasecmp(extension, ".gif") == 0) return "image/gif";
-        if (strcasecmp(extension, ".ico") == 0) return "image/x-icon";
+        if (extension != NULL) {
+            // matching page extensions
+            if (strcasecmp(extension, ".php") == 0) return "text/x-php";
+            if (strcasecmp(extension, ".html") == 0) return "text/html";
+            // matching javascript and css
+            if (strcasecmp(extension, ".js") == 0) return "text/javascript";
+            if (strcasecmp(extension, ".css") == 0) return "text/css";
+            // matching image files
+            if (strcasecmp(extension, ".jpg") == 0) return "image/jpeg";
+            if (strcasecmp(extension, ".png") == 0) return "image/png";
+            if (strcasecmp(extension, ".gif") == 0) return "image/gif";
+            if (strcasecmp(extension, ".ico") == 0) return "image/x-icon";
+        }
     }
     return NULL;
 }
 
 /**
- * Parses a request-line, storing its absolute-path at abs_path 
+ * Parses a request-line, storing its absolute-path at abs_path
  * and its query string at query, both of which are assumed
  * to be at least of length LimitRequestLine + 1.
  */
@@ -731,8 +721,8 @@ bool parse(const char* line, char* abs_path, char* query)
     }
     else
     {
-        strcpy(query, strtok(NULL, "?")); /* handle request with query */
         strcpy(abs_path, strtok(request, "?"));
+        strcpy(query, strtok(NULL, "?")); /* handle request with query */
     }
 
     strcat(abs_path, "\0");
@@ -798,7 +788,7 @@ bool request(char** message, size_t* length)
     *message = NULL;
     *length = 0;
 
-    // read message 
+    // read message
     while (*length < LimitRequestLine + LimitRequestFields * LimitRequestFieldSize + 4)
     {
         // read from socket
@@ -815,7 +805,7 @@ bool request(char** message, size_t* length)
             break;
         }
 
-        // append bytes to message 
+        // append bytes to message
         *message = realloc(*message, *length + bytes + 1);
         if (*message == NULL)
         {
