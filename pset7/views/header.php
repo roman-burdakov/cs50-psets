@@ -22,6 +22,9 @@
         <script src="/js/bootstrap.min.js"></script>
 
         <script src="/js/scripts.js"></script>
+        
+        <!-- fixing validator.w3.org error -->
+        <meta charset="UTF-8">
 
     </head>
 
@@ -38,6 +41,7 @@
                         <li><a href="quote.php">Quote</a></li>
                         <li><a href="buy.php">Buy</a></li>
                         <li><a href="sell.php">Sell</a></li>
+                        <li><a href="deposit.php">Deposit</a></li>
                         <li><a href="history.php">History</a></li>
                         <li><a href="logout.php"><strong>Log Out</strong></a></li>
                     </ul>

@@ -45,3 +45,19 @@
     /* surround with whitespace */
     margin: 20px;
 }
+
+#middle td {
+    text-align: left;
+}
+
+#middle td.DEPOSIT {
+    background-color: teal;
+}
+
+#middle td.BUY {
+    background-color: green;
+}
+
+#middle td.SELL {
+    background-color: red;
+}
