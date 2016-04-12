@@ -1,0 +1,4 @@
+mysql50 start/stop
+apache50 start/stop public
+https://ide50-roman-burdakov.cs50.io/phpmyadmin
+if https doesn't work for phpmyadmin, try http://..
